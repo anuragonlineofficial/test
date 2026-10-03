@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>News — Anureet</title><link rel="stylesheet" href="css/style.css"></head>
+<body>
+  <header><div class="container header-inner">
+    <a href="/" class="brand"><img src="logo.png" alt="Anureet">
+      <div class="brand-text"><div class="brand-title">ANUREET</div><div class="brand-sub">PRIVATE LIMITED</div></div>
+    </a>
+    <nav class="desktop" id="auth-area"></nav>
+  </div></header>
+  <main class="container" style="padding:50px 20px;">
+    <h1 class="section-title">News & Updates</h1>
+    <p class="section-sub">Latest announcements from Anureet Private Limited</p>
+    <div id="news-grid" class="grid-2"><div class="loader"></div></div>
+  </main>
+  <script type="module">
+    import './js/main.js';
+    import { db } from './js/firebase-config.js';
+    import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+    const box = document.getElementById('news-grid');
+    const snap = await getDocs(query(collection(db,'news'), where('published','==',true)));
+    const list = snap.docs.map(d=>d.data());
+    box.innerHTML = list.length ? list.map(n=>`
+      <div class="card">
+        <h3 style="color:var(--blue-900);">${n.title}</h3>
+        <p style="margin-top:10px;">${n.content}</p>
+      </div>`).join('') : '<p class="empty-state">No news yet</p>';
+  </script>
+</body>
+</html>
