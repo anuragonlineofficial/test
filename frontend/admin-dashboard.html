@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard — Anureet</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header><div class="container header-inner">
+    <a href="/" class="brand"><img src="logo.png" alt="Anureet">
+      <div class="brand-text"><div class="brand-title">ANUREET</div><div class="brand-sub">ADMIN PANEL</div></div>
+    </a>
+    <nav class="desktop" id="auth-area"></nav>
+  </div></header>
+
+  <div class="container">
+    <div class="dashboard">
+      <aside class="sidebar">
+        <a href="#" class="active" data-tab="overview">📊 Dashboard</a>
+        <a href="#" data-tab="services">🛠️ Services</a>
+        <a href="#" data-tab="apps">📋 Applications</a>
+        <a href="#" data-tab="users">👥 VLE Users</a>
+        <a href="#" data-tab="news">📰 News</a>
+        <a href="#" data-tab="messages">✉️ Messages</a>
+      </aside>
+
+      <main>
+        <div class="stat-grid" id="stats"></div>
+        <div class="card" id="tab-content"><div class="loader"></div></div>
+      </main>
+    </div>
+  </div>
+
+  <script type="module">
+    import { requireAuth, toast } from './js/main.js';
+    import { db } from './js/firebase-config.js';
+    import { collection, query, getDocs, addDoc, doc, updateDoc, deleteDoc, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+    let currentTab = 'overview';
+    let allApps = [], allServices = [], allUsers = [];
+
+    requireAuth(async (user, profile) => {
+      if (profile.role !== 'ADMIN') { location.href = '/vle-dashboard.html'; return; }
+      const [a,s,u] = await Promise.all([
+        getDocs(collection(db,'applications')),
+        getDocs(collection(db,'services')),
+        getDocs(collection(db,'users'))
+      ]);
+      allApps = a.docs.map(d=>({id:d.id,...d.data()}));
+      allServices = s.docs.map(d=>({id:d.id,...d.data()}));
+      allUsers = u.docs.map(d=>({id:d.id,...d.data()}));
+      renderStats();
+      renderTab();
+    });
+
+    function renderStats() {
+      document.getElementById('stats').innerHTML = `
+        <div class="stat-card"><div class="stat-label">VLE Users</div><div class="stat-value">${allUsers.filter(u=>u.role==='VLE').length}</div></div>
+        <div class="stat-card"><div class="stat-label">Services</div><div class="stat-value">${allServices.length}</div></div>
+        <div class="stat-card"><div class="stat-label">Applications</div><div class="stat-value">${allApps.length}</div></div>
+        <div class="stat-card"><div class="stat-label">Pending</div><div class="stat-value">${allApps.filter(a=>a.status==='Pending').length}</div></div>
+      `;
+    }
+
+    function renderTab() {
+      const box = document.getElementById('tab-content');
+      if (currentTab === 'overview') {
+        box.innerHTML = `<h3 style="color:var(--blue-900);margin-bottom:14px;">Quick Actions</h3>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="document.querySelector('[data-tab=services]').click()">+ Add Service</button>
+            <button class="btn btn-outline" onclick="document.querySelector('[data-tab=apps]').click()">View Applications</button>
+          </div>`;
+      } else if (currentTab === 'services') {
+        box.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <h3 style="color:var(--blue-900);">Services</h3>
+          <button class="btn btn-primary btn-sm" id="add-svc">+ Add Service</button>
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Name</th><th>Category</th><th>Fee</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>${allServices.map(s=>`<tr>
+            <td>${s.name}</td><td>${s.category||'-'}</td><td>₹${s.fee||0}</td>
+            <td><span class="pill pill-${s.active?'approved':'rejected'}">${s.active?'Active':'Inactive'}</span></td>
+            <td>
+              <button class="btn btn-outline btn-sm" onclick="toggleSvc('${s.id}',${s.active})">${s.active?'Disable':'Enable'}</button>
+              <button class="btn btn-danger btn-sm" onclick="delSvc('${s.id}')">Delete</button>
+            </td>
+          </tr>`).join('')||'<tr><td colspan="5" class="empty-state">No services</td></tr>'}</tbody>
+        </table></div>`;
+        document.getElementById('add-svc').onclick = addService;
+      } else if (currentTab === 'apps') {
+        box.innerHTML = `<h3 style="color:var(--blue-900);margin-bottom:16px;">Applications</h3>
+        <div class="table-wrap"><table>
+          <thead><tr><th>App ID</th><th>Service</th><th>User</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>${allApps.map(a=>`<tr>
+            <td><b>${a.applicationId}</b></td>
+            <td>${a.serviceName}</td>
+            <td>${a.userEmail||'-'}</td>
+            <td>₹${a.amount||0}</td>
+            <td><span class="pill pill-${pillClass(a.status)}">${a.status}</span></td>
+            <td>
+              <button class="btn btn-outline btn-sm" onclick="setStatus('${a.id}','Approved')">Approve</button>
+              <button class="btn btn-danger btn-sm" onclick="setStatus('${a.id}','Rejected')">Reject</button>
+            </td>
+          </tr>`).join('')||'<tr><td colspan="6" class="empty-state">No applications</td></tr>'}</tbody>
+        </table></div>`;
+      } else if (currentTab === 'users') {
+        box.innerHTML = `<h3 style="color:var(--blue-900);margin-bottom:16px;">VLE Users</h3>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Name</th><th>Email</th><th>Mobile</th><th>Role</th><th>Status</th></tr></thead>
+          <tbody>${allUsers.map(u=>`<tr>
+            <td>${u.name||'-'}</td><td>${u.email}</td><td>${u.mobile||'-'}</td>
+            <td><span class="tag">${u.role}</span></td>
+            <td><span class="pill pill-${u.status==='Active'?'approved':'pending'}">${u.status||'Active'}</span></td>
+          </tr>`).join('')||'<tr><td colspan="5" class="empty-state">No users</td></tr>'}</tbody>
+        </table></div>`;
+      } else if (currentTab === 'news') {
+        box.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <h3 style="color:var(--blue-900);">News</h3>
+          <button class="btn btn-primary btn-sm" id="add-news">+ Add News</button>
+        </div>
+        <div id="news-list" class="loader"></div>`;
+        document.getElementById('add-news').onclick = addNews;
+        loadNews();
+      } else if (currentTab === 'messages') {
+        box.innerHTML = `<h3 style="color:var(--blue-900);margin-bottom:16px;">Contact Messages</h3>
+        <div id="msg-list" class="loader"></div>`;
+        loadMessages();
+      }
+    }
+
+    function pillClass(s) {
+      if (s === 'Approved') return 'approved';
+      if (s === 'Rejected') return 'rejected';
+      if (s === 'Completed') return 'completed';
+      if (s === 'In Process') return 'process';
+      return 'pending';
+    }
+
+    // ---- Service CRUD ----
+    window.toggleSvc = async (id, active) => {
+      await updateDoc(doc(db,'services',id), { active: !active });
+      toast('Service updated', 'success');
+      location.reload();
+    };
+    window.delSvc = async (id) => {
+      if (!confirm('Delete this service?')) return;
+      await deleteDoc(doc(db,'services',id));
+      toast('Service deleted', 'success');
+      location.reload();
+    };
+    async function addService() {
+      const name = prompt('Service name:'); if (!name) return;
+      const category = prompt('Category (e.g., eDistrict):') || 'General';
+      const fee = parseInt(prompt('Fee (₹):') || '0', 10);
+      const description = prompt('Description:') || '';
+      const fieldsRaw = prompt('Fields (comma-separated, e.g., Applicant Name,Mobile,Address):') || '';
+      const fields = fieldsRaw.split(',').map(s=>s.trim()).filter(Boolean).map((lbl,i) => ({
+        name: 'field_' + i, label: lbl, type: 'text', required: true
+      }));
+      await addDoc(collection(db,'services'), {
+        name, category, fee, description, fields, active: true, order: Date.now(), createdAt: serverTimestamp()
+      });
+      toast('Service added', 'success');
+      location.reload();
+    }
+
+    // ---- Application status ----
+    window.setStatus = async (id, status) => {
+      const update = { status, updatedAt: serverTimestamp() };
+      if (status === 'Rejected') {
+        const reason = prompt('Rejection reason:') || '';
+        if (reason) update.rejectionReason = reason;
+      }
+      await updateDoc(doc(db,'applications',id), update);
+      // Notify user via backend
+      fetch('https://anureet-backend.onrender.com/api/notify/status', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ applicationId: id, status })
+      }).catch(()=>{});
+      toast(`Application ${status}`, 'success');
+      location.reload();
+    };
+
+    // ---- News ----
+    async function addNews() {
+      const title = prompt('Title:'); if (!title) return;
+      const content = prompt('Content:') || '';
+      await addDoc(collection(db,'news'), { title, content, published: true, createdAt: serverTimestamp() });
+      toast('News added', 'success');
+      loadNews();
+    }
+    async function loadNews() {
+      const snap = await getDocs(collection(db,'news'));
+      const list = snap.docs.map(d=>({id:d.id,...d.data()}));
+      document.getElementById('news-list').innerHTML = list.length ? list.map(n=>`
+        <div style="padding:14px;border-bottom:1px solid var(--border);">
+          <b style="color:var(--blue-900);">${n.title}</b>
+          <p style="font-size:13px;color:var(--muted);">${n.content||''}</p>
+        </div>
+      `).join('') : '<p class="empty-state">No news yet</p>';
+    }
+
+    // ---- Messages ----
+    async function loadMessages() {
+      const snap = await getDocs(collection(db,'messages'));
+      const list = snap.docs.map(d=>({id:d.id,...d.data()}));
+      document.getElementById('msg-list').innerHTML = list.length ? list.map(m=>`
+        <div style="padding:14px;border-bottom:1px solid var(--border);">
+          <b>${m.name} (${m.email})</b> - ${m.subject}
+          <p style="font-size:13px;color:var(--muted);">${m.message}</p>
+        </div>
+      `).join('') : '<p class="empty-state">No messages yet</p>';
+    }
+
+    document.querySelectorAll('.sidebar a[data-tab]').forEach(a => {
+      a.onclick = (e) => {
+        e.preventDefault();
+        document.querySelectorAll('.sidebar a').forEach(x=>x.classList.remove('active'));
+        a.classList.add('active');
+        currentTab = a.dataset.tab;
+        renderTab();
+      };
+    });
+  </script>
+</body>
+</html>
