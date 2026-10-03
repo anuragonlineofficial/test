@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Login — Anureet</title><link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body data-page="login">
+<header><div class="container hd">
+  <a href="index.html" class="brand"><img src="logo.png" alt="Anureet">
+    <div class="brand-t"><div class="t">ANUREET</div><div class="s">PRIVATE LIMITED</div></div>
+  </a>
+  <nav class="d" id="auth-area"></nav>
+</div></header>
+
+<div class="aw"><div class="ac">
+  <h1>Welcome to Anureet</h1>
+  <p class="sub">Login or create your account</p>
+
+  <div class="tabs">
+    <button class="active" data-tab="login-view">Login</button>
+    <button data-tab="register-view">Register</button>
+    <button data-tab="forgot-view">Forgot</button>
+  </div>
+
+  <!-- LOGIN -->
+  <div id="login-view" class="tab-view">
+    <form id="login-form">
+      <div class="fg"><label>Email</label><input type="email" id="email" class="input" required></div>
+      <div class="fg"><label>Password</label><input type="password" id="password" class="input" required></div>
+      <button class="btn bp" style="width:100%">Login</button>
+    </form>
+  </div>
+
+  <!-- REGISTER -->
+  <div id="register-view" class="tab-view" style="display:none">
+    <form id="reg-form">
+      <div class="fg"><label>Full Name</label><input id="r_name" class="input" required></div>
+      <div class="fg"><label>Email</label><input type="email" id="r_email" class="input" required></div>
+      <div class="fg"><label>Mobile (10 digits)</label><input type="tel" id="r_mobile" pattern="[0-9]{10}" class="input" required></div>
+      <div class="fg"><label>Password (min 6)</label><input type="password" id="r_password" minlength="6" class="input" required></div>
+      <button class="btn bp" style="width:100%">Register</button>
+    </form>
+  </div>
+
+  <!-- FORGOT -->
+  <div id="forgot-view" class="tab-view" style="display:none">
+    <form id="fp-form">
+      <div class="fg"><label>Email</label><input type="email" id="fp_email" class="input" required></div>
+      <button class="btn bp" style="width:100%">Send Reset Link</button>
+    </form>
+  </div>
+
+  <p style="text-align:center;font-size:14px;margin-top:16px"><a href="index.html">← Back to Home</a></p>
+</div></div>
+
+<script type="module">import './app.js';</script>
+</body>
+</html>
