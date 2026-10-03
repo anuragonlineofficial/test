@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Services — Anureet</title><link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body data-page="services">
+<header><div class="container hd">
+  <a href="index.html" class="brand"><img src="logo.png" alt="Anureet">
+    <div class="brand-t"><div class="t">ANUREET</div><div class="s">PRIVATE LIMITED</div></div>
+  </a>
+  <nav class="d" id="auth-area"></nav>
+  <button class="mt">☰</button>
+</div>
+<div class="mnav">
+  <a href="index.html">Home</a><a href="services.html">Services</a>
+  <a href="index.html#about">About</a><a href="index.html#contact">Contact</a>
+  <a href="login.html">Login</a>
+</div>
+</header>
+
+<main class="container" style="padding:40px 20px">
+  <h1 class="st">Our Services</h1>
+  <p class="ss">Browse all available digital services</p>
+  <div style="max-width:400px;margin-bottom:24px">
+    <input type="text" id="search" class="input" placeholder="🔍 Search services...">
+  </div>
+  <div class="g3" id="services-grid"><div class="loader"></div></div>
+</main>
+
+<footer><div class="container">
+  <div class="fb">© <span id="y"></span> Anureet Private Limited</div>
+</div></footer>
+<script type="module">import './app.js';document.getElementById('y').textContent=new Date().getFullYear();</script>
+</body>
+</html>
