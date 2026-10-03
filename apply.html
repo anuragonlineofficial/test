@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Apply — Anureet</title><link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body data-page="apply">
+<header><div class="container hd">
+  <a href="index.html" class="brand"><img src="logo.png" alt="Anureet">
+    <div class="brand-t"><div class="t">ANUREET</div><div class="s">PRIVATE LIMITED</div></div>
+  </a>
+  <nav class="d" id="auth-area"></nav>
+</div></header>
+
+<main class="container" style="padding:40px 20px;max-width:800px">
+  <div id="loading" class="loader"></div>
+  <div id="wrap" style="display:none">
+    <div class="card">
+      <span class="tag" id="svc-cat"></span>
+      <h1 id="svc-name" style="color:#1e3a8a;margin:8px 0"></h1>
+      <p id="svc-desc" style="color:#64748b;margin-bottom:20px"></p>
+      <div style="background:#eff6ff;padding:14px;border-radius:10px;margin-bottom:20px">
+        <b>Fee:</b> <span id="svc-fee" style="color:#1d4ed8;font-size:18px;font-weight:800"></span>
+      </div>
+      <form id="apply-form"></form>
+      <button id="pay-btn" class="btn bp" style="width:100%;margin-top:20px">Submit & Pay</button>
+    </div>
+  </div>
+</main>
+
+<script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+<script type="module">import './app.js';</script>
+</body>
+</html>
