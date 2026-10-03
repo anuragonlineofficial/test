@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Anureet Private Limited — Digital Services</title>
+<meta name="description" content="Anureet Private Limited - Digital Services, Jansewa, eDistrict, eCitizen in Hardoi, UP.">
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body data-page="home">
+<header><div class="container hd">
+  <a href="index.html" class="brand">
+    <img src="logo.png" alt="Anureet">
+    <div class="brand-t"><div class="t">ANUREET</div><div class="s">PRIVATE LIMITED</div></div>
+  </a>
+  <nav class="d" id="auth-area"></nav>
+  <button class="mt">☰</button>
+</div>
+<div class="mnav">
+  <a href="index.html">Home</a>
+  <a href="services.html">Services</a>
+  <a href="index.html#about">About</a>
+  <a href="index.html#contact">Contact</a>
+  <a href="login.html">Login</a>
+</div>
+</header>
+
+<main>
+  <section class="hero"><div class="container hg">
+    <div>
+      <span class="badge">DIGITAL SERVICES PLATFORM</span>
+      <h1>ANUREET<br><span>PRIVATE LIMITED</span></h1>
+      <p>Digital Services • Jansewa • eDistrict • eCitizen • Online Services. Trusted platform for VLE operators across Uttar Pradesh.</p>
+      <div class="ha">
+        <a href="services.html" class="btn bp">Explore Services</a>
+        <a href="login.html#register" class="btn bo">Register as VLE</a>
+      </div>
+    </div>
+    <div class="card">
+      <h3 style="color:#1e3a8a;margin-bottom:16px">Why Choose Us?</h3>
+      <ul style="list-style:none;font-size:14px">
+        <li style="margin-bottom:14px">🔒 <b>Secure Payments</b><br><span style="color:#64748b;font-size:13px">Cashfree verified</span></li>
+        <li style="margin-bottom:14px">⚡ <b>Fast Processing</b><br><span style="color:#64748b;font-size:13px">Real-time tracking</span></li>
+        <li style="margin-bottom:14px">📄 <b>All Govt Services</b><br><span style="color:#64748b;font-size:13px">eDistrict, Jansewa, eCitizen</span></li>
+        <li>👥 <b>VLE Network</b><br><span style="color:#64748b;font-size:13px">Dedicated dashboard</span></li>
+      </ul>
+    </div>
+  </div></section>
+
+  <section class="container">
+    <h2 class="st">Popular Services</h2>
+    <p class="ss">Choose from our wide range of digital services</p>
+    <div class="g3" id="home-services"><div class="loader"></div></div>
+  </section>
+
+  <section class="container" id="about">
+    <h2 class="st">About Us</h2>
+    <div class="card" style="line-height:1.9">
+      <p>Anureet Private Limited is a professional digital services platform dedicated to making essential government and citizen services easily accessible through a modern online ecosystem.</p>
+      <h3 style="color:#1e3a8a;margin-top:16px">Our Mission</h3>
+      <p>To simplify access to Digital Services, Jansewa Services, eDistrict Services, eCitizen Services, and other online services for citizens and VLE operators across India.</p>
+      <h3 style="color:#1e3a8a;margin-top:16px">Our Commitment</h3>
+      <p>Transparency, security, and professional service delivery. Every transaction is secured with verified payment gateways.</p>
+    </div>
+  </section>
+
+  <section class="container" id="contact">
+    <h2 class="st">Contact Us</h2>
+    <div class="g2">
+      <div class="card">
+        <h3 style="color:#1e3a8a;margin-bottom:16px">Send Message</h3>
+        <form id="contact-form">
+          <div class="fg"><label>Name</label><input class="input" id="c_name" required></div>
+          <div class="fg"><label>Email</label><input type="email" class="input" id="c_email" required></div>
+          <div class="fg"><label>Subject</label><input class="input" id="c_subject" required></div>
+          <div class="fg"><label>Message</label><textarea class="input" id="c_message" required></textarea></div>
+          <button class="btn bp" style="width:100%">Send Message</button>
+        </form>
+      </div>
+      <div class="card">
+        <h3 style="color:#1e3a8a;margin-bottom:16px">Contact Info</h3>
+        <p><b>📞 Phone:</b> +91-9451228744</p>
+        <p style="margin-top:10px"><b>✉️ Email:</b> ahardoi30@gmail.com</p>
+        <p style="margin-top:10px"><b>📍 Address:</b><br>1/7 Kanshiram Colony, Lucknow Road,<br>Hardoi, Uttar Pradesh, India 241001</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer><div class="container">
+  <div class="fg2">
+    <div><h3>Anureet Private Limited</h3><p>Digital Services • Jansewa • eDistrict • eCitizen</p></div>
+    <div><h4>Quick Links</h4><ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="services.html">Services</a></li>
+      <li><a href="index.html#about">About</a></li>
+      <li><a href="index.html#contact">Contact</a></li>
+    </ul></div>
+    <div><h4>Legal</h4><ul>
+      <li><a href="terms.html">Terms</a></li>
+      <li><a href="privacy.html">Privacy</a></li>
+    </ul></div>
+    <div><h4>Contact</h4>
+      <p>📞 +91-9451228744<br>✉️ ahardoi30@gmail.com<br>
+      📍 1/7 Kanshiram Colony, Lucknow Road, Hardoi, UP 241001</p>
+    </div>
+  </div>
+  <div class="fb">© <span id="y"></span> Anureet Private Limited</div>
+</div></footer>
+
+<script type="module">
+  import './app.js';
+  document.getElementById('y').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
