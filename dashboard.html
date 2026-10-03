@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dashboard — Anureet</title><link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body data-page="dashboard">
+<header><div class="container hd">
+  <a href="index.html" class="brand"><img src="logo.png" alt="Anureet">
+    <div class="brand-t"><div class="t">ANUREET</div><div class="s">DASHBOARD</div></div>
+  </a>
+  <nav class="d" id="auth-area"></nav>
+  <button class="mt">☰</button>
+</div></header>
+
+<div class="container">
+  <div style="padding:20px 0">
+    <h1 class="st" id="uname">Loading...</h1>
+    <span id="role" class="tag"></span>
+  </div>
+
+  <div class="dash">
+    <aside class="sb" id="side"></aside>
+    <main>
+      <div class="stats" id="stats"></div>
+      <div class="card" id="content"><div class="loader"></div></div>
+    </main>
+  </div>
+</div>
+
+<script type="module">import './app.js';</script>
+</body>
+</html>
