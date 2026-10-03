@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VLE Dashboard — Anureet</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header><div class="container header-inner">
+    <a href="/" class="brand"><img src="logo.png" alt="Anureet">
+      <div class="brand-text"><div class="brand-title">ANUREET</div><div class="brand-sub">VLE DASHBOARD</div></div>
+    </a>
+    <nav class="desktop" id="auth-area"></nav>
+    <button class="menu-toggle">☰</button>
+  </div></header>
+
+  <div class="container">
+    <div class="dashboard">
+      <aside class="sidebar">
+        <a href="#" class="active" data-tab="overview">📊 Overview</a>
+        <a href="#" data-tab="services">🛠️ Available Services</a>
+        <a href="#" data-tab="applications">📋 My Applications</a>
+        <a href="/">🏠 Home</a>
+      </aside>
+
+      <main>
+        <div id="welcome" style="margin-bottom:20px;">
+          <h1 class="section-title">Welcome</h1>
+          <p class="section-sub" id="user-name"></p>
+        </div>
+
+        <div class="stat-grid" id="stats"></div>
+
+        <div class="card" id="tab-content">
+          <div class="loader"></div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script type="module">
+    import './js/main.js';
+    import { requireAuth, toast } from './js/main.js';
+    import { db } from './js/firebase-config.js';
+    import { collection, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+    let currentTab = 'overview';
+    let applications = [];
+    let services = [];
+
+    requireAuth(async (user, profile) => {
+      document.getElementById('user-name').textContent = `Hello, ${profile.name || user.email}`;
+
+      // Load applications
+      const aq = query(collection(db, 'applications'), where('userId','==',user.uid));
+      const asnap = await getDocs(aq);
+      applications = asnap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
+
+      // Load services
+      const sq = query(collection(db, 'services'), where('active','==',true));
+      const ssnap = await getDocs(sq);
+      services = ssnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+      renderStats();
+      renderTab();
+    });
+
+    function renderStats() {
+      const counts = {
+        total: applications.length,
+        pending: applications.filter(a => a.status === 'Pending' || a.status === 'Payment Pending').length,
+        approved: applications.filter(a => a.status === 'Approved').length,
+        rejected: applications.filter(a => a.status === 'Rejected').length
+      };
+      document.getElementById('stats').innerHTML = `
+        <div class="stat-card"><div class="stat-label">Total</div><div class="stat-value">${counts.total}</div></div>
+        <div class="stat-card"><div class="stat-label">Pending</div><div class="stat-value">${counts.pending}</div></div>
+        <div class="stat-card"><div class="stat-label">Approved</div><div class="stat-value">${counts.approved}</div></div>
+        <div class="stat-card"><div class="stat-label">Rejected</div><div class="stat-value">${counts.rejected}</div></div>
+      `;
+    }
+
+    function renderTab() {
+      const box = document.getElementById('tab-content');
+      if (currentTab === 'overview') {
+        box.innerHTML = `<h3 style="color:var(--blue-900);margin-bottom:16px;">Recent Applications</h3>
+          ${applications.slice(0,5).map(renderAppRow).join('') || '<p class="empty-state">No applications yet. <a href="/services.html">Browse services</a></p>'}`;
+      } else if (currentTab === 'services') {
+        box.innerHTML = `<h3 style="color:var(--blue-900);margin-bottom:16px;">Available Services</h3>
+          <div class="grid-2">${services.map(s => `
+            <div class="service-card">
+              <div class="service-icon">${s.icon||'📄'}</div>
+              <h3>${s.name}</h3>
+              <div class="service-meta">
+                <span class="service-fee">₹${s.fee||0}</span>
+                <a href="/apply.html?id=${s.id}" class="btn btn-primary btn-sm">Apply</a>
+              </div>
+            </div>`).join('')}</div>`;
+      } else {
+        box.innerHTML = `<h3 style="color:var(--blue-900);margin-bottom:16px;">All Applications</h3>
+          <div class="table-wrap"><table>
+            <thead><tr><th>ID</th><th>Service</th><th>Amount</th><th>Status</th><th>Date</th><th></th></tr></thead>
+            <tbody>${applications.map(a => `
+              <tr>
+                <td><b>${a.applicationId}</b></td>
+                <td>${a.serviceName}</td>
+                <td>₹${a.amount}</td>
+                <td><span class="pill pill-${pillClass(a.status)}">${a.status}</span></td>
+                <td>${fmtDate(a.createdAt)}</td>
+                <td><button class="btn btn-outline btn-sm" onclick="alert('App ID: ${a.applicationId}\\nService: ${a.serviceName}\\nStatus: ${a.status}')">View</button></td>
+              </tr>`).join('') || '<tr><td colspan="6" class="empty-state">No applications</td></tr>'}</tbody>
+          </table></div>`;
+      }
+    }
+
+    function renderAppRow(a) {
+      return `<div style="padding:12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+        <div><b>${a.applicationId}</b><br><span style="font-size:13px;color:var(--muted);">${a.serviceName} • ₹${a.amount}</span></div>
+        <span class="pill pill-${pillClass(a.status)}">${a.status}</span>
+      </div>`;
+    }
+
+    function pillClass(s) {
+      if (s === 'Approved') return 'approved';
+      if (s === 'Rejected') return 'rejected';
+      if (s === 'Completed') return 'completed';
+      if (s === 'In Process') return 'process';
+      return 'pending';
+    }
+
+    function fmtDate(ts) {
+      if (!ts) return '-';
+      const d = ts.seconds ? new Date(ts.seconds*1000) : new Date(ts);
+      return d.toLocaleDateString('en-IN');
+    }
+
+    document.querySelectorAll('.sidebar a[data-tab]').forEach(a => {
+      a.onclick = (e) => {
+        e.preventDefault();
+        document.querySelectorAll('.sidebar a').forEach(x => x.classList.remove('active'));
+        a.classList.add('active');
+        currentTab = a.dataset.tab;
+        renderTab();
+      };
+    });
+  </script>
+</body>
+</html>
